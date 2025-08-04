@@ -1,24 +1,19 @@
-const { Telegraf } = require('telegraf');
-require('dotenv').config({ path: '.env' });
+const { Telegraf } =  require('telegraf')
+require('dotenv').config({override: true});
 
-if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.API_KEY) {
-    console.error('Ошибка: Не найдены необходимые переменные окружения!');
-    process.exit(1);
-}
+const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN)
 
-const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+bot.start((ctx) => {
+    ctx.reply('Привет! Я учебный бот. Используй /help для списка команд')
+});
 
-require('./api.js')(bot);
+bot.help((ctx) => {
+    ctx.reply('Список доступных команд: \nstart - начать общение\nhelp - помощь\n/courses - курсы');
+});
 
-bot.start((ctx) => ctx.reply('Привет! Я бот с искусственным интеллектом. Просто напиши мне что-нибудь.'));
-bot.help((ctx) => ctx.reply('ℹЭто бот с интеграцией AI. Просто задай вопрос в чат.'));
+bot.on('text', (ctx) => {
+    ctx.reply('Пока я понимаю только команды. Попробуй команду /help');
+});
 
-bot.launch()
-    .then(() => console.log('🤖 Бот успешно запущен!'))
-    .catch(err => {
-        console.error('🚨 Ошибка запуска бота:', err);
-        process.exit(1);
-    });
-
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+bot.launch();
+console.log('Bot started');
